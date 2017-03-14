@@ -43,7 +43,6 @@ DEALINGS IN THE SOFTWARE.
 
     this.node.onaudioprocess = function(e){
       if (!recording) return;
-      console.log(e.inputBuffer);
       worker.postMessage({
         command: 'record',
         buffer: [
@@ -78,7 +77,6 @@ DEALINGS IN THE SOFTWARE.
       worker.postMessage({ command: 'getBuffers' })
     }
 
-
     this.exportWAV = function(cb, type){
       currCallback = cb || config.callback;
       type = type || config.type || 'audio/wav';
@@ -110,9 +108,9 @@ DEALINGS IN THE SOFTWARE.
 
   Recorder.setupDownload = function(blob, filename){
     var url = (window.URL || window.webkitURL).createObjectURL(blob);
-    var link = document.getElementById("save");
-    link.href = url;
-    link.download = filename || 'output.wav';
+    //var link = document.getElementById("save");
+    //link.href = url;
+    //link.download = filename || 'output.wav';
   }
 
   window.Recorder = Recorder;
