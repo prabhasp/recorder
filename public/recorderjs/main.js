@@ -47,7 +47,10 @@ function gotBuffers( buffers ) {
     audioRecorder.exportWAV( doneEncoding );
     window.currentRecording = buffers;
     console.log(buffers);
+}
 
+function playRecording() {
+    var buffers = window.currentRecording;
     var newSource = audioContext.createBufferSource();
     var newBuffer = audioContext.createBuffer( 2, buffers[0].length, audioContext.sampleRate );
     newBuffer.getChannelData(0).set(buffers[0]);
@@ -56,13 +59,11 @@ function gotBuffers( buffers ) {
 
     newSource.connect( audioContext.destination );
     newSource.start(0);
-}
-
-
-function playRecording() {
+    return newSource.buffer;
 }
 
 function doneEncoding( blob ) {
+    window.currentRecordingBlob = blob;
     Recorder.setupDownload( blob, "myRecording" + ((recIndex<10)?"0":"") + recIndex + ".wav" );
     recIndex++;
 }
@@ -77,6 +78,29 @@ function startRecording() {
 function stopRecording() {
     audioRecorder.stop();
     audioRecorder.getBuffers( gotBuffers );
+}
+
+function upload() {
+    if(!window.currentRecordingBlob) {
+        console.log("No recording blob found!")
+    } else {
+        console.log(window.currentRecordingBlob);
+    }
+    var xhr = new XMLHttpRequest();
+    xhr.open('POST', 'http://prabhasp.com/fluency/up/up.php', true);
+    xhr.onload = function(e) {};
+    // Listen to the upload progress.
+    // assuming you have a progress element on your dom
+    //var progressBar = document.querySelector('progress');
+    xhr.upload.onprogress = function(e) {
+        if (e.lengthComputable) {
+            console.log(e.loaded / e.total);
+            //progressBar.value = (e.loaded / e.total) * 100;
+            //progressBar.textContent = progressBar.value; // Fallback for unsupported browsers.
+        }
+    };
+
+  xhr.send(window.currentRecordingBlob);
 }
 
 function convertToMono( input ) {
